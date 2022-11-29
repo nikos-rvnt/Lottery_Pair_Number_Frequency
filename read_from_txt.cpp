@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -45,14 +46,32 @@ void print_them(vector<vector<int>>& vecIn)
     }
 }
 
+
+void find_freqs( vector<vector<int>>& vecIn, vector<vector<int>>& vecFreqs){
+
+	for(int j=1; j<46; j++){
+		for(int i=1; i<46; i++){
+			for(int z=0; z<vecIn.size(); z++){
+			//for(int z=0; z<vecIn.size(); z++){
+				if((find(vecIn[z].begin(), vecIn[z].end(), i) != vecIn[z].end()) && (find(vecIn[z].begin(), vecIn[z].end(), j) != vecIn[z].end())){
+					vecFreqs[j-1][i-1] += 1;
+				}
+			}
+		}
+	}
+}
+
+
 void freq_to_txt(vector<vector<int>>& vecOut){
 
     string txt_output_file = "tzoker_pair_frequencies_output.txt";
     ofstream outFile(txt_output_file, ofstream::out);
 
     if (outFile.is_open()){
-    	for(int i=0; i<vecOut.size(); ++i){
-    		outFile << "f(1,2)=" << vecOut[i][0] << endl; 
+    	for(int j=0; j<vecOut.size(); ++j){
+	    	for(int i=0; i<vecOut[j].size(); ++i){
+    			outFile << "f(" << to_string(j+1) << "," << to_string(i+1) << ") = " << vecOut[j][i] << endl; 
+    		}
     	}
     	outFile.close();
 	}
@@ -75,8 +94,14 @@ int main(){
     // print data
     print_them( data_in);
 
+    // 2d vector to store frequencies of each pair among 1-45
+    vector<vector<int>> freqs(45, vector<int>(45));
+
+    // find frequencies of each pair
+    find_freqs(data_in,freqs);
+
     // write to txt
-    freq_to_txt(data_in);
+    freq_to_txt(freqs);
 
 
 	return 0;
